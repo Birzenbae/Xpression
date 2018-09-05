@@ -157,6 +157,21 @@ class Parser
                 case Lexer::T_COMMA:
                     $expectedTokenType = Lexer::T_OPERANDE;
                     break;
+                case Lexer::T_NULL:
+                    if (null !== $comparisonFirstOperande && $comparisonMethod === 'eq') {
+                        $expression = $this->expressionBuilder->isNull($comparisonFirstOperande);
+                        $comparisonFirstOperande = null;
+                        $comparisonMethod = null;
+                        $currentTokenValue = null;
+                        $expectedTokenType = Lexer::T_COMPOSITE | Lexer::T_CLOSE_PARENTHESIS;
+                        break;
+                    }
+                    throw new \LogicException(sprintf(
+                        'Token mismatch. Expected token %s given %s',
+                        $this->lexer->getLiteral($expectedTokenType),
+                        $currentTokenType
+                    ));
+                    break;
                 case Lexer::T_INPUT_PARAMETER:
                     $currentTokenValue = $this->expressionBuilder->parameter($currentToken['value'], null !== $comparisonFirstOperande);
                 case Lexer::T_STRING:
